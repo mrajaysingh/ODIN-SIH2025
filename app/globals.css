@@ -1,0 +1,447 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Hide scrollbars globally */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* WebKit browsers (Chrome, Safari, Edge) */
+}
+
+/* Draggable Recent Reports with Auto-scroll */
+.reports-scroll {
+  height: 120px; /* Show only one report card at a time */
+  overflow: hidden;
+  position: relative;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.reports-scroll::-webkit-scrollbar {
+  display: none; /* WebKit browsers (Chrome, Safari, Edge) */
+}
+
+.reports-track {
+  display: block;
+  animation: reports-scroll-up 60s linear infinite;
+}
+
+@keyframes reports-scroll-up {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+
+/* Hide MapTiler logo */
+iframe[src*="maptiler.com"] {
+  filter: contrast(1.1);
+}
+
+/* Block MapTiler logo specifically */
+iframe[src*="maptiler.com"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Hide geolocate control and prevent duplicate controls */
+.maplibregl-ctrl-geolocate {
+  display: none !important;
+}
+
+/* Ensure only one set of navigation controls */
+.maplibregl-ctrl-group {
+  position: relative;
+}
+
+/* Hide any duplicate compass controls */
+.maplibregl-ctrl-compass {
+  display: none !important;
+}
+
+/* Hide duplicate navigation controls - keep only the first one */
+.maplibregl-ctrl-group:not(:first-of-type) {
+  display: none !important;
+}
+
+/* Ensure only one zoom control group */
+.maplibregl-ctrl-zoom {
+  position: relative;
+}
+
+/* Hide any duplicate zoom controls */
+.maplibregl-ctrl-zoom:not(:first-of-type) {
+  display: none !important;
+}
+
+/* Modern Dropdown Styling */
+.modern-dropdown {
+  position: relative;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+.modern-dropdown::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #6b7280;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-dropdown:focus::after {
+  border-top-color: #3b82f6;
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.modern-dropdown:hover::after {
+  border-top-color: #4b5563;
+}
+
+.modern-dropdown option {
+  padding: 12px 16px;
+  background-color: white;
+  color: #1f2937;
+  font-weight: 500;
+  border: none;
+}
+
+.modern-dropdown option:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.modern-dropdown option:checked {
+  background-color: #dbeafe;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+/* Enhanced focus states */
+.modern-dropdown:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border-color: #3b82f6;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+  /* Improve touch targets */
+  button, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better spacing for mobile */
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Optimize text sizes for mobile */
+  h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+  
+  h3 {
+    font-size: 1.125rem;
+    line-height: 1.4;
+  }
+  
+  /* Improve form elements on mobile */
+  input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 0.75rem;
+  }
+  
+  /* Better button sizing */
+  .btn-mobile {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    min-height: 48px;
+  }
+  
+  /* Optimize card layouts */
+  .card-mobile {
+    margin: 0.5rem;
+    padding: 1rem;
+    border-radius: 0.75rem;
+  }
+  
+  /* Improve map container on mobile */
+  .map-mobile {
+    height: 250px;
+    border-radius: 0.75rem;
+  }
+  
+  /* Better sidebar on mobile */
+  .sidebar-mobile {
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  /* Optimize floating button */
+  .floating-btn-mobile {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .map-tablet {
+    height: 400px;
+  }
+  
+  .sidebar-tablet {
+    width: 280px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  .hover\:bg-gray-50:hover {
+    background-color: transparent;
+  }
+  
+  .hover\:shadow-md:hover {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Improve touch feedback */
+  button:active, a:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Better focus states for touch */
+  input:focus, select:focus, textarea:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Ensure crisp borders and shadows */
+  .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-width: 896px) and (orientation: landscape) {
+  .map-landscape {
+    height: 200px;
+  }
+  
+  .header-landscape {
+    padding: 0.5rem 0;
+  }
+  
+  .sidebar-landscape {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+}
+
+/* Mobile Navigation Menu Enhancements */
+.mobile-menu-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.mobile-menu-item:hover::before {
+  left: 100%;
+}
+
+/* Mobile menu animation improvements */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.mobile-menu-enter {
+  animation: slideDown 0.3s ease-out;
+}
+
+.mobile-menu-exit {
+  animation: slideUp 0.3s ease-in;
+}
+
+/* Mobile menu backdrop blur effect */
+@media (max-width: 1024px) {
+  .mobile-menu-backdrop {
+    backdrop-filter: blur(4px);
+    background: rgba(30, 58, 138, 0.95);
+  }
+}
+
+/* Preloader Animations */
+@keyframes logo-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes logo-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+@keyframes progress-glow {
+  0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(6, 182, 212, 0.6); }
+  100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
+}
+
+@keyframes wave {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Preloader specific styles */
+.preloader-logo {
+  animation: logo-rotate 3s linear infinite, logo-pulse 2s ease-in-out infinite;
+}
+
+.preloader-progress {
+  animation: progress-glow 2s ease-in-out infinite;
+}
+
+.preloader-wave {
+  animation: wave 2s ease-in-out infinite;
+}
+
+.preloader-fade-in {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.preloader-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.preloader-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shimmer 2s infinite;
+}
+
+/* Disable scroll when preloader is active */
+body.preloader-active {
+  overflow: hidden;
+  height: 100vh;
+  position: fixed;
+  width: 100%;
+}
+
+/* Hide floating button when preloader is active */
+body.preloader-active .floating-report-button {
+  display: none !important;
+}
