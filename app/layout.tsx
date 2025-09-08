@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lato } from "next/font/google";
 import "./globals.css";
 import Header from "./components/Header";
+import Footer from "./components/Footer";
 import ClientLayout from "./components/ClientLayout";
 
 const geistSans = Geist({
@@ -97,7 +98,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/ODIN-tp svg.svg" type="image/svg+xml" />
@@ -164,7 +165,7 @@ export default function RootLayout({
               "screenshot": "https://odin.skyber.dev/og-image.jpg",
               "softwareVersion": "1.0.0",
               "datePublished": "2024-01-01",
-              "dateModified": new Date().toISOString().split('T')[0],
+              "dateModified": "2024-01-01",
               "inLanguage": "en-US",
               "isAccessibleForFree": true,
               "browserRequirements": "Requires JavaScript. Requires HTML5.",
@@ -180,6 +181,7 @@ export default function RootLayout({
         <ClientLayout>
           <Header />
           {children}
+          <Footer />
         </ClientLayout>
       </body>
     </html>

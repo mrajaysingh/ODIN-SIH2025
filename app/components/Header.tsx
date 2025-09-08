@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Header() {
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
@@ -81,7 +82,7 @@ export default function Header() {
 
       {/* Main Navigation - Animated */}
       <nav 
-        className={`bg-[#1e3a8a] shadow-lg px-2 sm:px-4 lg:px-8 py-3 sm:py-4 transition-all duration-300 ease-in-out ${
+        className={`bg-[#1e3a8a] shadow-lg px-2 sm:px-4 lg:px-8 py-3 sm:py-4 transition-all duration-300 ease-in-out rounded-b-[15px] ${
           !isMounted || isHeaderVisible 
             ? 'translate-y-0 opacity-100' 
             : '-translate-y-full opacity-0'
@@ -117,7 +118,7 @@ export default function Header() {
                   case 'Live Alerts':
                     return '/#alerts';
                   case 'Community':
-                    return '/#community';
+                    return '/community';
                 case 'About O.D.I.N.':
                   return '/#about';
                   default:
@@ -126,7 +127,7 @@ export default function Header() {
               };
 
               return (
-                <a
+                <Link
                   key={item}
                   href={getHref(item)}
                   onClick={() => setActiveMenu(item)}
@@ -137,7 +138,7 @@ export default function Header() {
                   }`}
                 >
                   {item}
-                </a>
+                </Link>
               );
             })}
           </div>
@@ -216,7 +217,7 @@ export default function Header() {
                   case 'Live Alerts':
                     return '/#alerts';
                   case 'Community':
-                    return '/#community';
+                    return '/community';
                 case 'About O.D.I.N.':
                   return '/#about';
                   default:
@@ -225,7 +226,7 @@ export default function Header() {
               };
 
               return (
-                <a
+                <Link
                   key={item}
                   href={getHref(item)}
                   onClick={() => {
@@ -265,7 +266,7 @@ export default function Header() {
                     </svg>
                   )}
                   <span>{item}</span>
-                </a>
+                </Link>
               );
             })}
           </div>

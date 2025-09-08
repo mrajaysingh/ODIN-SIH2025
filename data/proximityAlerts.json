@@ -1,0 +1,67 @@
+{
+  "alerts": [
+    {
+      "id": "oil-spill-alert-1",
+      "coordinates": {
+        "lng": 77.801436,
+        "lat": 7.271375
+      },
+      "alertType": "oil-spill",
+      "lottiePath": "/animation/hotspot/not-complete-safe-orange.json",
+      "alertName": "Oil Spill",
+      "title": "Proximity Alert",
+      "timeToCoast": "50 min",
+      "evacuationTime": "25 min",
+      "windSpeed": "18 km/h → E",
+      "observer": "Coastal Ops",
+      "severity": "medium",
+      "colors": {
+        "bg": "#dc2626",
+        "border": "#b91c1c",
+        "text": "#ffffff"
+      }
+    },
+    {
+      "id": "tsunami-alert-2",
+      "coordinates": {
+        "lng": 80.278152,
+        "lat": 13.082680
+      },
+      "alertType": "tsunami",
+      "lottiePath": "/animation/hotspot/danger-red.json",
+      "alertName": "Tsunami Warning",
+      "title": "Critical Alert",
+      "timeToCoast": "30 min",
+      "evacuationTime": "15 min",
+      "windSpeed": "25 km/h → SE",
+      "observer": "NDRF Emergency",
+      "severity": "critical",
+      "colors": {
+        "bg": "#b91c1c",
+        "border": "#991b1b",
+        "text": "#ffffff"
+      }
+    },
+        {
+      "id": "tsunami-alert-3",
+      "coordinates": {
+        "lng": 72.509193,
+        "lat": 6.700032
+      },
+      "alertType": "hightide",
+      "lottiePath": "/animation/hotspot/little-safe-yellow.json",
+      "alertName": "Tsunami Warning",
+      "title": "Critical Alert",
+      "timeToCoast": "30 min",
+      "evacuationTime": "15 min",
+      "windSpeed": "25 km/h → SE",
+      "observer": "Rahul Mannjhi",
+      "severity": "critical",
+      "colors": {
+        "bg": "#b91c1c",
+        "border": "#991b1b",
+        "text": "#ffffff"
+      }
+    }
+  ]
+}

@@ -1,7 +1,12 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import Map from './components/Map';
+import Link from 'next/link';
+import { PieChart } from '@mui/x-charts';
+import HomeMain from './components/HomeMain';
+import HomeSidebar from './components/HomeSidebar';
+import ImpactSection from './components/ImpactSection';
+import MapSection from './components/MapSection';
 
 export default function Home() {
   const reportsContainerRef = useRef<HTMLDivElement>(null);
@@ -97,80 +102,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-2 sm:px-4 pt-2 sm:pt-4 pb-20 sm:pb-32 flex flex-col lg:flex-row gap-2 sm:gap-4">
-        {/* Left: Map container */}
-        <div className="flex-1 w-full lg:w-auto">
-          <div className="bg-white rounded-[15px] sm:rounded-[25px] p-0.5 shadow-lg h-[300px] sm:h-[400px] lg:h-[500px] relative overflow-hidden">
-            <Map className="w-full h-full" />
-          </div>
-          
-          {/* Statistics Cards - Government Style */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-2 sm:mt-4">
-            {/* Lives Saved Card */}
-            <div className="bg-white border-2 border-gray-200 p-3 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-center">
-                <div className="mb-2 sm:mb-3">
-                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-100 mx-auto rounded-lg flex items-center justify-center">
-                    <svg className="h-4 w-4 sm:h-6 sm:w-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">Lives Saved</h3>
-                <p className="text-lg sm:text-3xl font-bold text-green-700 mb-2">1,247</p>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Emergency Response</p>
-              </div>
-            </div>
-
-            {/* Active Volunteers Card */}
-            <div className="bg-white border-2 border-gray-200 p-3 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-center">
-                <div className="mb-3">
-                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 mx-auto rounded-lg flex items-center justify-center">
-                    <svg className="h-4 w-4 sm:h-6 sm:w-6 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-3-3h-2M9 20H4v-2a3 3 0 013-3h2m6-7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">Active Volunteers</h3>
-                <p className="text-lg sm:text-3xl font-bold text-blue-700 mb-2">3,456</p>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Community Support</p>
-              </div>
-            </div>
-
-            {/* Total Reports Card */}
-            <div className="bg-white border-2 border-gray-200 p-3 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-center">
-                <div className="mb-3">
-                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-orange-100 mx-auto rounded-lg flex items-center justify-center">
-                    <svg className="h-4 w-4 sm:h-6 sm:w-6 text-orange-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">Total Reports</h3>
-                <p className="text-lg sm:text-3xl font-bold text-orange-700 mb-2">8,923</p>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Incident Reports</p>
-              </div>
-            </div>
-
-            {/* Coastal Regions Card */}
-            <div className="bg-white border-2 border-gray-200 p-3 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-center">
-                <div className="mb-3">
-                  <div className="w-8 h-8 sm:w-12 sm:h-12 bg-purple-100 mx-auto rounded-lg flex items-center justify-center">
-                    <svg className="h-4 w-4 sm:h-6 sm:w-6 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-sm sm:text-lg font-semibold text-gray-900 mb-1">Coastal Regions</h3>
-                <p className="text-lg sm:text-3xl font-bold text-purple-700 mb-2">127</p>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Monitored Areas</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Left: Map + Cards + Impact */}
+        <HomeMain className="flex-1 w-full lg:w-auto" />
 
         {/* Right: Separate containers */}
         <div className="w-full lg:w-[300px] shrink-0 flex flex-col gap-2 sm:gap-4">
@@ -453,8 +386,56 @@ export default function Home() {
           </div>
           </div>
 
+          {/* Proximity Data Container */}
+          <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-4 sm:p-6 mt-2">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Proximity Data</h3>
+            <div className="flex justify-center">
+              <PieChart
+                width={280}
+                height={220}
+                sx={{ '& .MuiChartsLegend-root': { display: 'none' } }}
+                series={[
+                  {
+                    data: [
+                      { id: 0, value: 10, label: 'Within 5 km', color: '#ef4444' },
+                      { id: 1, value: 20, label: 'Within 10 km', color: '#f97316' },
+                      { id: 2, value: 30, label: 'Within 15 km', color: '#f59e0b' },
+                      { id: 3, value: 40, label: '15+ km', color: '#10b981' },
+                    ],
+                    innerRadius: 30,
+                    outerRadius: 100,
+                    paddingAngle: 5,
+                    cornerRadius: 5,
+                    startAngle: -45,
+                    endAngle: 225,
+                    cx: 150,
+                    cy: 110,
+                  },
+                ]}
+              />
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-700">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: '#ef4444' }} />
+                <span>Within 5 km</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: '#f97316' }} />
+                <span>Within 10 km</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: '#f59e0b' }} />
+                <span>Within 15 km</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: '#10b981' }} />
+                <span>15+ km</span>
+              </div>
+            </div>
+          </div>
+
           {/* Contact Information Container - Government Style */}
-          <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-4 sm:p-6 h-[450px] sm:h-[450px] overflow-y-auto">
+          <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-4 sm:p-6 h-[470px] sm:h-[470px] overflow-y-auto">
             <div className="flex items-center gap-2 mb-6">
               <svg className="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -523,7 +504,7 @@ export default function Home() {
           </div>
 
           {/* Safety Tips Container */}
-          <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-3 sm:p-4 h-[280px] sm:h-[350px] overflow-hidden">
+          <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-3 sm:p-4 h-[850px] sm:h-[365px] overflow-hidden">
             <div className="flex items-center gap-2 mb-3">
               <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -561,9 +542,13 @@ export default function Home() {
         </div>
         </div>
 
+
+
+
+
         {/* Floating Report Hazard Button */}
         <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 floating-report-button">
-          <a
+          <Link
             href="/report-hazard"
             className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 sm:px-6 sm:py-4 rounded-full shadow-lg flex items-center gap-2 sm:gap-3 transition-all duration-200 hover:shadow-xl transform hover:scale-105"
           >
@@ -572,7 +557,7 @@ export default function Home() {
             </svg>
             <span className="font-semibold text-sm sm:text-lg hidden sm:inline">Report Hazard Now</span>
             <span className="font-semibold text-sm sm:hidden">Report</span>
-          </a>
+          </Link>
         </div>
       </main>
   );

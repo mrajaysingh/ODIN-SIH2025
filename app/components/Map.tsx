@@ -1,8 +1,10 @@
 'use client';
 
 import { useRef, useEffect, useState } from 'react';
+import lottie from 'lottie-web';
 import * as maptilersdk from '@maptiler/sdk';
 import '@maptiler/sdk/dist/maptiler-sdk.css';
+import proximityAlertsData from '../../data/proximityAlerts.json';
 
 interface MapProps {
   className?: string;
@@ -63,6 +65,12 @@ export default function Map({ className = '' }: MapProps) {
 
       // Add place labels to the map
       addPlaceLabels();
+
+      // Wait until preloader is not active before adding hotspots
+      waitForPreloaderInactive().then(() => {
+        // Load alerts dynamically from data file
+        loadProximityAlerts();
+      });
     });
 
     // Additional cleanup to prevent duplicates
@@ -92,6 +100,304 @@ export default function Map({ className = '' }: MapProps) {
       }
     };
   }, [isMounted]);
+
+  // Wait until the preloader body class is removed
+  const waitForPreloaderInactive = (): Promise<void> => {
+    return new Promise((resolve) => {
+      if (typeof document === 'undefined') return resolve();
+      const isInactive = () => !document.body.classList.contains('preloader-active');
+      if (isInactive()) return resolve();
+      const observer = new MutationObserver(() => {
+        if (isInactive()) {
+          observer.disconnect();
+          resolve();
+        }
+      });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    });
+  };
+
+  // Function to load proximity alerts from data file and place them on map
+  const loadProximityAlerts = () => {
+    if (!map.current || !proximityAlertsData.alerts) {
+      console.log('Map or alerts data not available');
+      return;
+    }
+
+    console.log('Loading proximity alerts:', proximityAlertsData.alerts.length, 'alerts found');
+    
+    const coordinates = proximityAlertsData.alerts.map(alert => [alert.coordinates.lng, alert.coordinates.lat]);
+    console.log('Alert coordinates:', coordinates);
+
+    // Add each alert to the map
+    proximityAlertsData.alerts.forEach((alert, index) => {
+      console.log(`Adding alert ${index + 1}:`, alert.id, 'at coordinates:', alert.coordinates);
+      
+      addAlertHotspotConfigured(
+        alert.coordinates.lng,
+        alert.coordinates.lat,
+        {
+          lottiePath: alert.lottiePath,
+          title: alert.title,
+          alertType: alert.alertName,
+          timeToCoast: alert.timeToCoast,
+          evacuationTime: alert.evacuationTime,
+          wind: alert.windSpeed,
+          observer: alert.observer,
+          colors: alert.colors
+        }
+      );
+    });
+
+    // Fit all alert markers in view if there are any
+    if (coordinates.length > 0) {
+      const lngs = coordinates.map(coord => coord[0]);
+      const lats = coordinates.map(coord => coord[1]);
+      const sw: [number, number] = [Math.min(...lngs), Math.min(...lats)];
+      const ne: [number, number] = [Math.max(...lngs), Math.max(...lats)];
+      console.log('Fitting bounds:', { sw, ne });
+      map.current?.fitBounds([sw, ne], { padding: 80, duration: 800 });
+    }
+  };
+
+  // Add configurable hotspot with custom lottie and popup styling/content
+  const addAlertHotspotConfigured = (
+    lng: number,
+    lat: number,
+    options: {
+      lottiePath: string;
+      title: string;
+      alertType: string;
+      timeToCoast: string;
+      evacuationTime: string;
+      wind: string;
+      observer: string;
+      colors: { bg: string; border: string; text: string };
+    }
+  ) => {
+    if (!map.current) return;
+
+    console.log(`Creating marker for alert at ${lng}, ${lat} with animation: ${options.lottiePath}`);
+    
+    const container = document.createElement('div');
+    container.style.width = '84px';
+    container.style.height = '84px';
+    container.style.pointerEvents = 'auto';
+    container.style.zIndex = '9999';
+    container.style.position = 'relative';
+    container.style.cursor = 'pointer';
+    container.style.transform = 'translate(-50%, -50%)';
+    container.style.backgroundColor = 'rgba(255, 0, 0, 0.3)'; // Temporary red background for debugging
+
+    // Add error handling for Lottie animations
+    try {
+      const animation = lottie.loadAnimation({
+        container,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: options.lottiePath,
+        rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
+      });
+      
+      animation.addEventListener('data_ready', () => {
+        console.log(`Lottie animation loaded successfully for ${options.alertType} at ${lng}, ${lat}`);
+        // Remove red background once animation loads
+        container.style.backgroundColor = 'transparent';
+      });
+      
+      animation.addEventListener('data_failed', () => {
+        console.error(`Failed to load Lottie animation: ${options.lottiePath}`);
+        // Keep red background if animation fails to load
+        container.innerHTML = '⚠️'; // Fallback emoji
+        container.style.display = 'flex';
+        container.style.alignItems = 'center';
+        container.style.justifyContent = 'center';
+        container.style.fontSize = '24px';
+      });
+    } catch (error) {
+      console.error(`Error loading Lottie animation: ${error}`);
+      // Fallback if Lottie fails completely
+      container.innerHTML = '⚠️';
+      container.style.display = 'flex';
+      container.style.alignItems = 'center';
+      container.style.justifyContent = 'center';
+      container.style.fontSize = '24px';
+    }
+
+    const marker = new maptilersdk.Marker({ element: container, anchor: 'center' })
+      .setLngLat([lng, lat])
+      .addTo(map.current);
+      
+    console.log(`Marker added to map at ${lng}, ${lat}`);
+    console.log('Current map markers count:', map.current._markers?.length || 'unknown');
+
+    const popupHtml = `
+      <div style="min-width:220px;max-width:260px;background:${options.colors.bg};color:${options.colors.text};border:1px solid ${options.colors.border};border-radius:8px;padding:10px;box-shadow:0 6px 16px rgba(0,0,0,0.25)">
+        <div style="font-weight:700;margin-bottom:6px">${options.title}</div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:2px">
+          <span>Alert</span><span style="font-weight:700">${options.alertType}</span>
+        </div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:2px">
+          <span>Time to Coast</span><span style="font-weight:700">${options.timeToCoast}</span>
+        </div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:2px">
+          <span>Evacuation Time</span><span style="font-weight:700">${options.evacuationTime}</span>
+        </div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:2px">
+          <span>Wind</span><span style="font-weight:700">${options.wind}</span>
+        </div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:6px">
+          <span>Observer</span><span style="font-weight:700">${options.observer}</span>
+        </div>
+        <div style="font-size:11px;opacity:0.85">Lat ${lat.toFixed(6)}, Lng ${lng.toFixed(6)}</div>
+      </div>
+    `;
+
+    const popup = new maptilersdk.Popup({ closeButton: true, closeOnMove: false, closeOnClick: false, offset: 12 })
+      .setHTML(popupHtml);
+
+    let hoveringContainer = false;
+    let hoveringPopup = false;
+    const conditionalHide = () => {
+      setTimeout(() => {
+        if (!hoveringContainer && !hoveringPopup) {
+          popup.remove();
+        }
+      }, 80);
+    };
+    const onContainerEnter = () => { hoveringContainer = true; show(); };
+    const onContainerLeave = () => { hoveringContainer = false; conditionalHide(); };
+    const onClick = (e: MouseEvent) => { e.stopPropagation(); show(); };
+
+    const onPopupEnter = () => { hoveringPopup = true; };
+    const onPopupLeave = () => { hoveringPopup = false; conditionalHide(); };
+
+    const show = () => {
+      popup.setLngLat([lng, lat]).addTo(map.current!);
+    };
+
+    // Attach popup hover listeners only when popup is opened and element exists
+    popup.on('open', () => {
+      const el = popup.getElement();
+      if (!el) return;
+      el.addEventListener('mouseenter', onPopupEnter);
+      el.addEventListener('mouseleave', onPopupLeave);
+    });
+
+    container.addEventListener('mouseenter', onContainerEnter);
+    container.addEventListener('mouseleave', onContainerLeave);
+    container.addEventListener('click', onClick);
+
+    return () => {
+      container.removeEventListener('mouseenter', onContainerEnter);
+      container.removeEventListener('mouseleave', onContainerLeave);
+      container.removeEventListener('click', onClick);
+      const el = popup.getElement();
+      if (el) {
+        el.removeEventListener('mouseenter', onPopupEnter);
+        el.removeEventListener('mouseleave', onPopupLeave);
+      }
+      popup.remove();
+    };
+  };
+
+  // Add a Lottie hotspot marker at [lng, lat]
+  const addAlertHotspot = (lng: number, lat: number) => {
+    if (!map.current) return;
+
+    const container = document.createElement('div');
+    container.style.width = '84px';
+    container.style.height = '84px';
+    container.style.pointerEvents = 'auto';
+    container.style.zIndex = '9999';
+    container.style.position = 'relative';
+    container.style.cursor = 'pointer';
+    container.style.transform = 'translate(-50%, -50%)';
+
+    lottie.loadAnimation({
+      container,
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      path: '/animation/hotspot/danger-red.json',
+      rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
+    });
+
+    const marker = new maptilersdk.Marker({ element: container, anchor: 'center' })
+      .setLngLat([lng, lat])
+      .addTo(map.current);
+
+    // Popup content for proximity alert
+    const popupHtml = `
+      <div style="min-width:220px;max-width:260px;background:#dc2626;color:#ffffff;border:1px solid #b91c1c;border-radius:8px;padding:10px;box-shadow:0 6px 16px rgba(0,0,0,0.25)">
+        <div style="font-weight:700;margin-bottom:6px">Proximity Alert</div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:2px">
+          <span>Alert</span><span style="font-weight:700">Tsunami</span>
+        </div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:2px">
+          <span>Time to Coast</span><span style="font-weight:700">35 min</span>
+        </div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:2px">
+          <span>Evacuation Time</span><span style="font-weight:700">20 min</span>
+        </div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:2px">
+          <span>Wind</span><span style="font-weight:700">28 km/h ↗ NE</span>
+        </div>
+        <div style="font-size:12px;display:flex;justify-content:space-between;margin-bottom:6px">
+          <span>Observer</span><span style="font-weight:700">ODIN Watch</span>
+        </div>
+        <div style="font-size:11px;opacity:0.85">Lat ${lat.toFixed(6)}, Lng ${lng.toFixed(6)}</div>
+      </div>
+    `;
+
+    const popup = new maptilersdk.Popup({ closeButton: true, closeOnMove: false, closeOnClick: false, offset: 12 })
+      .setHTML(popupHtml);
+
+    // Show popup on hover and click
+    let hoveringContainer = false;
+    let hoveringPopup = false;
+    const show = () => popup.setLngLat([lng, lat]).addTo(map.current!);
+    const conditionalHide = () => {
+      // Delay slightly to allow pointer to move between marker and popup
+      setTimeout(() => {
+        if (!hoveringContainer && !hoveringPopup) {
+          popup.remove();
+        }
+      }, 80);
+    };
+    const onContainerEnter = () => {
+      hoveringContainer = true;
+      show();
+    };
+    const onContainerLeave = () => {
+      hoveringContainer = false;
+      conditionalHide();
+    };
+    const onClick = (e: MouseEvent) => { e.stopPropagation(); show(); };
+
+    container.addEventListener('mouseenter', onContainerEnter);
+    container.addEventListener('mouseleave', onContainerLeave);
+    container.addEventListener('click', onClick);
+
+    // Track popup hover state
+    const popupEl = popup.getElement();
+    const onPopupEnter = () => { hoveringPopup = true; };
+    const onPopupLeave = () => { hoveringPopup = false; conditionalHide(); };
+    popupEl.addEventListener('mouseenter', onPopupEnter);
+    popupEl.addEventListener('mouseleave', onPopupLeave);
+
+    // Return cleanup
+    return () => {
+      container.removeEventListener('mouseenter', onContainerEnter);
+      container.removeEventListener('mouseleave', onContainerLeave);
+      container.removeEventListener('click', onClick);
+      const el = popup.getElement();
+      el.removeEventListener('mouseenter', onPopupEnter);
+      el.removeEventListener('mouseleave', onPopupLeave);
+      popup.remove();
+    };
+  };
 
   // Function to add place labels to the map
   const addPlaceLabels = () => {
@@ -130,7 +436,7 @@ export default function Map({ className = '' }: MapProps) {
             ['in', ['get', 'name'], ['literal', [
               // Major coastal cities
               'Mumbai', 'Chennai', 'Kolkata', 'Kochi', 'Cochin', 'Visakhapatnam', 'Vizag', 
-              'Surat', 'Panaji', 'Goa', 'Puducherry', 'Pondicherry', 'Ernakulam',
+              'Surat', 'Panaji', 'Goa', 'Puducherry', 'Pondicherry', 'Ernakulam','colachel',
               // Major sea ports
               'Jawaharlal Nehru Port', 'JNPT', 'Navi Mumbai', 'Kandla', 'Deendayal Port',
               'Mormugao Port', 'New Mangalore Port', 'Paradip Port', 'Port Blair Port',
@@ -272,7 +578,7 @@ export default function Map({ className = '' }: MapProps) {
 
         // Wait for map to load before adding controls
         map.current.on('load', () => {
-          setLoadingStep('Data loaded');
+          setLoadingStep('Loading alerts...');
           
           // Remove any existing navigation controls first
           const existingControls = mapContainer.current?.querySelectorAll('.maplibregl-ctrl-group');
@@ -287,14 +593,22 @@ export default function Map({ className = '' }: MapProps) {
           // Add place labels to the map
           addPlaceLabels();
           
-          // Wait a bit then fade in
-          setTimeout(() => {
-            setMapOpacity(1);
+          // Wait until preloader is not active before adding hotspots
+          waitForPreloaderInactive().then(() => {
+            // Reload proximity alerts from data file
+            loadProximityAlerts();
+            
+            setLoadingStep('Data loaded');
+            
+            // Wait a bit then fade in
             setTimeout(() => {
-              setIsReloading(false);
-              setLoadingStep('');
+              setMapOpacity(1);
+              setTimeout(() => {
+                setIsReloading(false);
+                setLoadingStep('');
+              }, 500);
             }, 500);
-          }, 500);
+          });
         });
 
         // Additional cleanup to prevent duplicates
