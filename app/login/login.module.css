@@ -1,0 +1,264 @@
+/* Background slider container */
+.background {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Slider background container */
+.sliderBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+/* Individual slider images */
+.sliderImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+/* Active slider image */
+.sliderImage.active {
+  opacity: 1;
+}
+
+/* Individual slider videos */
+.sliderVideo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+}
+
+.sliderVideo.active {
+  opacity: 1;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+}
+
+/* Form Box */
+.formBox {
+  background: rgba(30, 58, 138, 0.92);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.35);
+  color: white;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Title */
+.formBox h1 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #FF6900;
+}
+
+/* Row for side-by-side inputs */
+.row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.row input,
+.row select,
+.row button,
+.row .googleBtn {
+  flex: 1;
+}
+
+/* Inputs & Selects */
+.form input,
+.form select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1f2937;
+  outline: none;
+  font-size: 1rem;
+  display: block;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.form input:focus,
+.form select:focus {
+  border-color: #1E3A8A;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+}
+
+/* Buttons */
+.form button {
+  width: 100%;
+  padding: 12px;
+  background: #1E3A8A;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.05s ease-in-out;
+  margin-top: 10px;
+}
+
+.form button:hover {
+  background: #16327a;
+}
+
+.form button:active {
+  transform: translateY(1px);
+}
+
+
+/* Google Login Button */
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #1f2937;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.googleBtn img {
+  width: 18px;
+  height: 18px;
+}
+
+.googleBtn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* Links */
+.link {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: white;
+}
+
+.link a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link a:hover {
+  color: #FF6900;
+  text-decoration: underline;
+}
+
+/* Hide forms initially */
+.form {
+  display: none;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  position: absolute;
+  width: 100%;
+  left: 0;
+}
+
+/* Show active form */
+.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  position: relative;
+}
+
+/* Location Section */
+.locationSection {
+  margin: 15px 0;
+}
+
+.fetchLocationBtn {
+  width: 100%;
+  padding: 12px;
+  background: #FF6900;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.05s ease-in-out;
+  margin-bottom: 10px;
+}
+
+.fetchLocationBtn:hover {
+  background: #e55a00;
+}
+
+.fetchLocationBtn:active {
+  transform: translateY(1px);
+}
+
+.fetchLocationBtn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.coordinatesDisplay {
+  margin-top: 10px;
+}
+
+.readOnlyInput {
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+  cursor: not-allowed;
+  border-color: #d1d5db !important;
+}
+
+.readOnlyInput:focus {
+  border-color: #d1d5db !important;
+  box-shadow: none !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .row {
+    flex-direction: column;
+  }
+}
+
+

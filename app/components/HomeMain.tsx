@@ -13,7 +13,6 @@ export default function HomeMain({ className }: HomeMainProps) {
     <div className={className ?? ''}>
       <MapSection />
       <StatsCards />
-
       <ImpactSection />
     </div>
   );

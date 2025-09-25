@@ -84,6 +84,39 @@ export default function ImpactSection() {
       <div className="lg:col-span-2">
         <SyncedDisasterCarousel />
       </div>
+
+      {/* Support O.D.I.N. Section */}
+      <div className="lg:col-span-2 mt-2 sm:mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 bg-white rounded-[12px] sm:rounded-[16px] border border-gray-200 overflow-hidden shadow-md min-h-[360px] sm:min-h-[420px] lg:min-h-[520px]">
+          {/* Left: Image */}
+          <div className="relative h-full">
+            <img
+              src="/incident/support/support-odin.jpg"
+              alt="Support O.D.I.N."
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Right: Content */}
+          <div className="p-4 sm:p-6 flex flex-col justify-center">
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Support O.D.I.N.</h3>
+            <p className="mt-2 text-gray-700 leading-relaxed">
+              Help us build resilient coastal communities with faster alerts, better reporting tools, and
+              community training. Your support keeps this platform free and accessible for everyone.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a href="#" className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors">
+                Donate Now
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+              </a>
+              <a href="#" className="inline-flex items-center gap-2 border border-gray-300 hover:border-gray-400 text-gray-900 font-medium px-4 py-2 rounded-lg bg-white transition-colors">
+                Become a Volunteer
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,9 +1,17 @@
 'use client';
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import PlaneSwitch from "../components/PlaneSwitch";
 
 export default function ReportHazardPage() {
   const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [showOfflineConfirm, setShowOfflineConfirm] = useState(false);
+  const [offlineSliderValue, setOfflineSliderValue] = useState(0);
+  const [offlineConfirmed, setOfflineConfirmed] = useState(false);
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const firstErrorRef = useRef<HTMLDivElement | null>(null);
+
   const [formData, setFormData] = useState({
     hazardType: "",
     location: "",
@@ -54,16 +62,28 @@ export default function ReportHazardPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const newErrors: Record<string, string> = {};
 
-    // Simulate form submission
-    const referenceId =
-      "ODN-" +
-      Math.random().toString(36).substr(2, 9).toUpperCase();
-    alert(
-      `Report submitted successfully! Reference ID: ${referenceId}`,
-    );
+    if (!formData.hazardType) newErrors.hazardType = "Please select a hazard type.";
+    if (!formData.location) newErrors.location = "Please provide a location or coordinates.";
+    if (!formData.severity) newErrors.severity = "Please select a severity level.";
+    if (!formData.description) newErrors.description = "Please describe the hazard.";
+    if (!formData.files || formData.files.length === 0) newErrors.files = "Please attach at least one photo or video.";
+    if (!formData.contactInfo) newErrors.contactInfo = "Please provide contact information for follow-up.";
 
-    // Reset form
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      // Scroll to first error
+      setTimeout(() => {
+        firstErrorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 0);
+      return;
+    }
+
+    const referenceId = "ODN-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+    alert(`Report submitted successfully! Reference ID: ${referenceId}`);
+
     setFormData({
       hazardType: "",
       location: "",
@@ -72,17 +92,60 @@ export default function ReportHazardPage() {
       contactInfo: "",
       files: null,
     });
+    setErrors({});
   };
 
   const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by this browser.');
+      return;
+    }
+    setIsFetchingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
         setFormData((prev) => ({
           ...prev,
           location: `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`,
         }));
-      });
+        setIsFetchingLocation(false);
+      },
+      (error) => {
+        alert('Error fetching location: ' + error.message);
+        setIsFetchingLocation(false);
+      }
+    );
+  };
+
+  const requestEnableOffline = () => {
+    setOfflineSliderValue(0);
+    setOfflineConfirmed(false);
+    setShowOfflineConfirm(true);
+  };
+
+  const handleOfflineToggle = (checked: boolean) => {
+    if (checked) {
+      requestEnableOffline();
+    } else {
+      setIsOfflineMode(false);
     }
+  };
+
+  const handleOfflineSlide = (value: number) => {
+    setOfflineSliderValue(value);
+    if (value >= 100 && !offlineConfirmed) {
+      setOfflineConfirmed(true);
+      setTimeout(() => {
+        setIsOfflineMode(true);
+        setShowOfflineConfirm(false);
+        setOfflineSliderValue(0);
+      }, 250);
+    }
+  };
+
+  const cancelOfflineConfirm = () => {
+    setShowOfflineConfirm(false);
+    setOfflineSliderValue(0);
+    setOfflineConfirmed(false);
   };
 
   return (
@@ -133,15 +196,7 @@ export default function ReportHazardPage() {
                         {isOfflineMode ? "Offline" : "Online"}
                       </span>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={isOfflineMode}
-                        onChange={(e) => setIsOfflineMode(e.target.checked)}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                    </label>
+                    <PlaneSwitch checked={isOfflineMode} onChange={handleOfflineToggle} />
                   </div>
                 </div>
 
@@ -159,7 +214,7 @@ export default function ReportHazardPage() {
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} noValidate className="space-y-6">
                   {/* Hazard Type */}
                   <div className="space-y-3">
                     <label htmlFor="hazardType" className="block text-sm font-semibold text-gray-800 tracking-wide">
@@ -175,7 +230,6 @@ export default function ReportHazardPage() {
                         }))
                       }
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 shadow-sm hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer modern-dropdown"
-                      required
                     >
                       <option value="">Select hazard type</option>
                       {hazardTypes.map((type) => (
@@ -184,6 +238,9 @@ export default function ReportHazardPage() {
                         </option>
                       ))}
                     </select>
+                    {errors.hazardType && (
+                      <div ref={!firstErrorRef.current ? firstErrorRef : undefined} className="text-red-600 text-xs mt-1">{errors.hazardType}</div>
+                    )}
                   </div>
 
                   {/* Location */}
@@ -191,7 +248,7 @@ export default function ReportHazardPage() {
                     <label htmlFor="location" className="block text-sm font-medium text-gray-700">
                       Location *
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-stretch">
                       <input
                         id="location"
                         type="text"
@@ -204,22 +261,41 @@ export default function ReportHazardPage() {
                           }))
                         }
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-                        required
                       />
                       <button
                         type="button"
                         onClick={getCurrentLocation}
-                        className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-1 bg-white text-gray-900"
+                        disabled={isFetchingLocation}
+                        className="px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2 bg-white text-gray-900 disabled:opacity-70 disabled:cursor-not-allowed"
                       >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                        {isFetchingLocation ? (
+                          <span className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        )}
+                        <span className="text-sm">{isFetchingLocation ? 'Fetching' : 'Use GPS'}</span>
                       </button>
                     </div>
-                    <p className="text-xs text-gray-600">
-                      Click the pin icon to auto-capture your current location
-                    </p>
+                    {isFetchingLocation ? (
+                      <div className="mt-1 text-xs text-gray-700 flex items-center gap-1">
+                        <span>Fetching location</span>
+                        <span className="inline-flex -space-x-0.5">
+                          <span className="w-1.5 h-1.5 bg-gray-500 rounded-full inline-block animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-1.5 h-1.5 bg-gray-500 rounded-full inline-block animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-1.5 h-1.5 bg-gray-500 rounded-full inline-block animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-600">
+                        Click the pin icon to auto-capture your current location
+                      </p>
+                    )}
+                    {errors.location && (
+                      <div ref={!firstErrorRef.current ? firstErrorRef : undefined} className="text-red-600 text-xs mt-1">{errors.location}</div>
+                    )}
                   </div>
 
                   {/* Severity */}
@@ -237,7 +313,6 @@ export default function ReportHazardPage() {
                         }))
                       }
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 shadow-sm hover:border-gray-400 transition-all duration-200 appearance-none cursor-pointer modern-dropdown"
-                      required
                     >
                       <option value="">Select severity</option>
                       <option value="low">Low - Minor concern</option>
@@ -245,6 +320,9 @@ export default function ReportHazardPage() {
                       <option value="high">High - Immediate action needed</option>
                       <option value="critical">Critical - Emergency response required</option>
                     </select>
+                    {errors.severity && (
+                      <div ref={!firstErrorRef.current ? firstErrorRef : undefined} className="text-red-600 text-xs mt-1">{errors.severity}</div>
+                    )}
                   </div>
 
                   {/* Description */}
@@ -263,14 +341,16 @@ export default function ReportHazardPage() {
                         }))
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-24 bg-white text-gray-900"
-                      required
                     />
+                    {errors.description && (
+                      <div ref={!firstErrorRef.current ? firstErrorRef : undefined} className="text-red-600 text-xs mt-1">{errors.description}</div>
+                    )}
                   </div>
 
                   {/* File Upload */}
                   <div className="space-y-2">
                     <label htmlFor="files" className="block text-sm font-medium text-gray-700">
-                      Photos/Videos (Optional)
+                      Photos/Videos *
                     </label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-white">
                       <div className="space-y-2">
@@ -298,17 +378,18 @@ export default function ReportHazardPage() {
                             }
                           />
                         </div>
-                        <p className="text-xs text-gray-600">
-                          Support: JPG, PNG, MP4 (Max 10MB each)
-                        </p>
+                        <p className="text-xs text-gray-600">Support: JPG, PNG, MP4 (Max 10MB each)</p>
                       </div>
                     </div>
+                    {errors.files && (
+                      <div ref={!firstErrorRef.current ? firstErrorRef : undefined} className="text-red-600 text-xs mt-1">{errors.files}</div>
+                    )}
                   </div>
 
                   {/* Contact Info */}
                   <div className="space-y-2">
                     <label htmlFor="contactInfo" className="block text-sm font-medium text-gray-700">
-                      Contact Information (Optional)
+                      Contact Information *
                     </label>
                     <input
                       id="contactInfo"
@@ -323,9 +404,10 @@ export default function ReportHazardPage() {
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                     />
-                    <p className="text-xs text-gray-600">
-                      Only used by authorities for verification if needed
-                    </p>
+                    <p className="text-xs text-gray-600">Only used by authorities for verification if needed</p>
+                    {errors.contactInfo && (
+                      <div ref={!firstErrorRef.current ? firstErrorRef : undefined} className="text-red-600 text-xs mt-1">{errors.contactInfo}</div>
+                    )}
                   </div>
 
                   {/* Submit Button */}
@@ -443,6 +525,58 @@ export default function ReportHazardPage() {
           </div>
         </div>
       </div>
+
+      {/* Offline Confirm Modal */}
+      {showOfflineConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={cancelOfflineConfirm}></div>
+          <div className="relative z-10 w-[92%] max-w-lg bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden animate-[slidedown_0.4s_ease]">
+            <div className="px-5 pt-5 pb-3">
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">Enable Offline Reporting</h3>
+              <p className="text-sm text-gray-800">Reports will be stored on your device and sent when you reconnect.</p>
+              <p className="text-sm text-gray-700 mt-2">To confirm, drag the slider fully to the right.</p>
+            </div>
+            <div className="px-4 py-4 bg-gray-100 border-t border-gray-200">
+              <div className="relative bg-white border border-gray-300 rounded-full h-[52px] flex items-center px-2 overflow-hidden">
+                <div
+                  className="absolute left-1 top-1 bottom-1 rounded-full bg-orange-100 transition-all"
+                  style={{ width: `${offlineSliderValue}%` }}
+                />
+                <input
+                  id="offline-confirm"
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={offlineSliderValue}
+                  onChange={(e) => handleOfflineSlide(Number(e.target.value))}
+                  className="offline-confirm-range relative z-10 w-full h-[50px] bg-transparent appearance-none cursor-ew-resize"
+                />
+              </div>
+              <div className="text-center h-[28px] mt-2">
+                {offlineConfirmed ? (
+                  <span className="text-green-700 text-base font-semibold">Offline mode enabled.</span>
+                ) : (
+                  <span className="text-gray-600 text-sm">Slide to confirm</span>
+                )}
+              </div>
+              <div className="mt-2 text-center">
+                <button onClick={cancelOfflineConfirm} className="text-xs text-gray-600 hover:text-gray-800 underline">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Scoped styles for range thumb */}
+          <style jsx>{`
+            @keyframes slidedown { 0% { transform: translateY(10px); opacity: 0; } 65%,100% { transform: translateY(0); opacity: 1; } }
+            .offline-confirm-range::-webkit-slider-thumb { -webkit-appearance: none !important; appearance: none !important; height: 40px; width: 180px; border: 1px solid #ea580c; border-radius: 20px; background: linear-gradient(#fb923c,#f97316); box-shadow: 0 2px 6px rgba(249,115,22,0.35); background-repeat: no-repeat; background-position: center; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E"); }
+            .offline-confirm-range::-moz-range-thumb { height: 40px; width: 180px; border: 1px solid #ea580c; border-radius: 20px; background: linear-gradient(#fb923c,#f97316); box-shadow: 0 2px 6px rgba(249,115,22,0.35); }
+            .offline-confirm-range::-ms-thumb { height: 40px; width: 180px; border: 1px solid #ea580c; border-radius: 20px; background: linear-gradient(#fb923c,#f97316); box-shadow: 0 2px 6px rgba(249,115,22,0.35); }
+            .offline-confirm-range::-webkit-slider-runnable-track { height: 48px; background: transparent; }
+            .offline-confirm-range::-moz-range-track { height: 48px; background: transparent; }
+            .offline-confirm-range::-ms-track { height: 48px; background: transparent; border-color: transparent; color: transparent; }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 }

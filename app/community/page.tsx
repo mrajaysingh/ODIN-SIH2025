@@ -14,6 +14,7 @@ import {
   LuEye,
   LuBell,
 } from 'react-icons/lu';
+import NewsSection from '../components/NewsSection';
 
 export default function CommunityPage() {
   const [refreshing, setRefreshing] = useState(false);
@@ -147,6 +148,11 @@ export default function CommunityPage() {
                 Refresh Data
               </button>
             </div>
+          </div>
+
+          {/* Latest Ocean Disaster News Section */}
+          <div className="mb-6 sm:mb-8">
+            <NewsSection />
           </div>
 
           <div className="grid lg:grid-cols-3 gap-4 sm:gap-8">

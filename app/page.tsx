@@ -7,6 +7,7 @@ import HomeMain from './components/HomeMain';
 import HomeSidebar from './components/HomeSidebar';
 import ImpactSection from './components/ImpactSection';
 import MapSection from './components/MapSection';
+import AutoScrollNews from './components/AutoScrollNews';
 
 export default function Home() {
   const reportsContainerRef = useRef<HTMLDivElement>(null);
@@ -105,15 +106,28 @@ export default function Home() {
         {/* Left: Map + Cards + Impact */}
         <HomeMain className="flex-1 w-full lg:w-auto" />
 
-        {/* Right: Separate containers */}
-        <div className="w-full lg:w-[300px] shrink-0 flex flex-col gap-2 sm:gap-4">
-          {/* Recent Reports Container */}
-          <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-3 sm:p-4 h-[200px] sm:h-[250px] overflow-hidden flex flex-col">
-            <h3 className="text-sm font-semibold text-gray-800 mb-2">Recent Reports</h3>
-            {/* Recent Reports container - Draggable */}
+        {/* Right: Modern Sidebar */}
+        <div className="w-full lg:w-[320px] shrink-0 flex flex-col gap-3 sm:gap-4">
+          {/* Recent Reports Container - Modern Design */}
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-4 h-[220px] sm:h-[270px] overflow-hidden flex flex-col backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                  </svg>
+                </div>
+                <h3 className="text-sm font-bold text-gray-800">Recent Reports</h3>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs text-gray-500 font-medium">Live</span>
+              </div>
+            </div>
+            {/* Recent Reports container - Modern Draggable */}
             <div 
               ref={reportsContainerRef}
-              className={`reports-scroll bg-gray-50 rounded-lg p-2 sm:p-3 border border-gray-200 flex-1 overflow-y-auto cursor-grab select-none touch-pan-y ${
+              className={`reports-scroll bg-gradient-to-b from-gray-50 to-white rounded-xl p-3 border border-gray-200/50 flex-1 overflow-y-auto cursor-grab select-none touch-pan-y shadow-inner ${
                 isDragging ? 'cursor-grabbing' : ''
               }`}
               onMouseDown={handleMouseDown}
@@ -131,50 +145,62 @@ export default function Home() {
             <div className="reports-track space-y-3 text-sm text-gray-700">
               {/* Copy A */}
               <div className="space-y-3">
-                {/* Card 1 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-                  <div className="flex items-center justify-between text-xs text-gray-500">
+                {/* Card 1 - Modern Design */}
+                <div className="rounded-2xl border border-red-200/50 bg-gradient-to-br from-red-50 to-white p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center justify-between text-xs mb-3">
                     <div className="flex gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-red-100 text-red-700 font-semibold">Critical</span>
-                      <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 font-semibold">Active</span>
+                      <span className="px-3 py-1 rounded-full bg-gradient-to-r from-red-500 to-red-600 text-white font-bold text-xs shadow-md">Critical</span>
+                      <span className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white font-bold text-xs shadow-md">Active</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3"/></svg>
-                      3 hours ago
+                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                      <svg className="h-3 w-3 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3"/></svg>
+                      <span className="text-gray-600 font-medium">3h ago</span>
                     </div>
                   </div>
-                  <h4 className="mt-2 text-base font-semibold text-gray-900">Tsunami Warning</h4>
-                  <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.5 10.5c0 7.5-7.5 10.5-7.5 10.5S4.5 18 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
-                    Visakhapatnam Coast, Andhra Pradesh
+                  <h4 className="text-base font-bold text-gray-900 mb-2 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    Tsunami Warning
+                  </h4>
+                  <div className="flex items-center gap-2 text-xs text-gray-600 mb-3 bg-blue-50 px-3 py-2 rounded-lg">
+                    <svg className="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.5 10.5c0 7.5-7.5 10.5-7.5 10.5S4.5 18 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                    <span className="font-medium">Visakhapatnam Coast, Andhra Pradesh</span>
                   </div>
-                  <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                    <div className="flex items-center gap-1"><svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-3-3h-2M9 20H4v-2a3 3 0 013-3h2m6-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>23 reports</div>
-                    <div>ID: ALT-001</div>
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                      <svg className="h-3 w-3 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-3-3h-2M9 20H4v-2a3 3 0 013-3h2m6-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                      <span className="font-medium text-gray-600">23 reports</span>
+                    </div>
+                    <div className="bg-gray-200 px-2 py-1 rounded-full font-mono text-gray-700">ALT-001</div>
                   </div>
                 </div>
 
-                {/* Card 2 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-                  <div className="flex items-center justify-between text-xs text-gray-500">
+                {/* Card 2 - Modern Design */}
+                <div className="rounded-2xl border border-orange-200/50 bg-gradient-to-br from-orange-50 to-white p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <div className="flex items-center justify-between text-xs mb-3">
                     <div className="flex gap-2">
-                      <span className="px-2 py-0.5 rounded-md bg-orange-100 text-orange-700 font-semibold">High</span>
-                      <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-700 font-semibold">Active</span>
+                      <span className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-xs shadow-md">High</span>
+                      <span className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-400 to-orange-500 text-white font-bold text-xs shadow-md">Active</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3"/></svg>
-                      2 mins ago
+                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                      <svg className="h-3 w-3 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3"/></svg>
+                      <span className="text-gray-600 font-medium">2m ago</span>
                     </div>
                   </div>
-                  <h4 className="mt-2 text-base font-semibold text-gray-900">High Tide</h4>
-                  <div className="mt-1 flex items-center gap-2 text-xs text-gray-600">
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.5 10.5c0 7.5-7.5 10.5-7.5 10.5S4.5 18 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
-                    Mumbai Marina, Maharashtra
+                  <h4 className="text-base font-bold text-gray-900 mb-2 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                    High Tide
+                  </h4>
+                  <div className="flex items-center gap-2 text-xs text-gray-600 mb-3 bg-blue-50 px-3 py-2 rounded-lg">
+                    <svg className="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.5 10.5c0 7.5-7.5 10.5-7.5 10.5S4.5 18 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+                    <span className="font-medium">Mumbai Marina, Maharashtra</span>
                   </div>
-                  <p className="mt-2 text-sm text-gray-700">Abnormal high tide levels causing coastal flooding in low-lying areas.</p>
-                  <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-                    <div className="flex items-center gap-1"><svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-3-3h-2M9 20H4v-2a3 3 0 013-3h2m6-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>45 reports</div>
-                    <div>ID: ALT-002</div>
+                  <p className="text-sm text-gray-700 mb-3 bg-yellow-50 px-3 py-2 rounded-lg border-l-4 border-yellow-400">Abnormal high tide levels causing coastal flooding in low-lying areas.</p>
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                      <svg className="h-3 w-3 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-3-3h-2M9 20H4v-2a3 3 0 013-3h2m6-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                      <span className="font-medium text-gray-600">45 reports</span>
+                    </div>
+                    <div className="bg-gray-200 px-2 py-1 rounded-full font-mono text-gray-700">ALT-002</div>
                   </div>
                 </div>
               </div>
@@ -386,9 +412,19 @@ export default function Home() {
           </div>
           </div>
 
-          {/* Proximity Data Container */}
-          <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-4 sm:p-6 mt-2">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Proximity Data</h3>
+          {/* Proximity Data Container - Modern Design */}
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-5 mt-2 backdrop-blur-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-green-600 rounded flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Proximity Data</h3>
+                <p className="text-xs text-gray-500">Real-time distance analysis</p>
+              </div>
+            </div>
             <div className="flex justify-center">
               <PieChart
                 width={280}
@@ -414,25 +450,28 @@ export default function Home() {
                 ]}
               />
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-700">
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: '#ef4444' }} />
-                <span>Within 5 km</span>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-3 bg-red-50 px-3 py-2 rounded-xl border border-red-100">
+                <span className="inline-block w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: '#ef4444' }} />
+                <span className="text-sm font-medium text-gray-700">Within 5 km</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: '#f97316' }} />
-                <span>Within 10 km</span>
+              <div className="flex items-center gap-3 bg-orange-50 px-3 py-2 rounded-xl border border-orange-100">
+                <span className="inline-block w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: '#f97316' }} />
+                <span className="text-sm font-medium text-gray-700">Within 10 km</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: '#f59e0b' }} />
-                <span>Within 15 km</span>
+              <div className="flex items-center gap-3 bg-yellow-50 px-3 py-2 rounded-xl border border-yellow-100">
+                <span className="inline-block w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: '#f59e0b' }} />
+                <span className="text-sm font-medium text-gray-700">Within 15 km</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: '#10b981' }} />
-                <span>15+ km</span>
+              <div className="flex items-center gap-3 bg-green-50 px-3 py-2 rounded-xl border border-green-100">
+                <span className="inline-block w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: '#10b981' }} />
+                <span className="text-sm font-medium text-gray-700">15+ km</span>
               </div>
             </div>
           </div>
+
+          {/* India Coastal News Container */}
+          <AutoScrollNews className="mt-2" />
 
           {/* Contact Information Container - Government Style */}
           <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-4 sm:p-6 h-[470px] sm:h-[470px] overflow-y-auto">
@@ -503,47 +542,69 @@ export default function Home() {
 
           </div>
 
-          {/* Safety Tips Container */}
-          <div className="bg-white rounded-[12px] sm:rounded-[16px] shadow-lg p-3 sm:p-4 h-[850px] sm:h-[365px] overflow-hidden">
-            <div className="flex items-center gap-2 mb-3">
-              <svg className="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <h3 className="text-sm font-semibold text-blue-600">Safety Tips</h3>
+          {/* Safety Tips Container - Modern Design */}
+          <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl border border-gray-100 p-5 h-[850px] sm:h-[365px] overflow-hidden backdrop-blur-sm">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-orange-600 rounded flex items-center justify-center">
+                <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V16H8V11H9.2V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.4,8.7 10.4,10V11H13.6V10C13.6,8.7 12.8,8.2 12,8.2Z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Safety Tips</h3>
+                <p className="text-xs text-gray-500">Essential safety guidelines</p>
+              </div>
             </div>
             
-            <div className="space-y-2">
-              <div className="bg-blue-50 rounded-lg p-3 flex items-start gap-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-xs text-gray-700">Stay away from the coastline during high tide warnings</p>
+            <div className="space-y-3 overflow-y-auto h-[calc(100%-80px)] pr-2">
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-xs font-bold">1</span>
+                  </div>
+                  <p className="text-sm text-gray-700 font-medium">Stay away from the coastline during high tide warnings</p>
+                </div>
               </div>
               
-              <div className="bg-blue-50 rounded-lg p-3 flex items-start gap-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-xs text-gray-700">Do not venture into water during storm conditions</p>
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-xs font-bold">2</span>
+                  </div>
+                  <p className="text-sm text-gray-700 font-medium">Do not venture into water during storm conditions</p>
+                </div>
               </div>
               
-              <div className="bg-blue-50 rounded-lg p-3 flex items-start gap-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-xs text-gray-700">Follow evacuation orders immediately when issued</p>
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-xs font-bold">3</span>
+                  </div>
+                  <p className="text-sm text-gray-700 font-medium">Follow evacuation orders immediately when issued</p>
+                </div>
               </div>
               
-              <div className="bg-blue-50 rounded-lg p-3 flex items-start gap-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-xs text-gray-700">Keep emergency kit ready with water, food, and first aid</p>
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-xs font-bold">4</span>
+                  </div>
+                  <p className="text-sm text-gray-700 font-medium">Keep emergency kit ready with water, food, and first aid</p>
+                </div>
               </div>
               
-              <div className="bg-blue-50 rounded-lg p-3 flex items-start gap-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-xs text-gray-700">Monitor official weather updates regularly</p>
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-white text-xs font-bold">5</span>
+                  </div>
+                  <p className="text-sm text-gray-700 font-medium">Monitor official weather updates regularly</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
         </div>
-
-
-
 
 
         {/* Floating Report Hazard Button */}
@@ -562,3 +623,5 @@ export default function Home() {
       </main>
   );
 }
+
+

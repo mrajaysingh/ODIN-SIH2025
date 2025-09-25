@@ -3,8 +3,8 @@
     {
       "id": "oil-spill-alert-1",
       "coordinates": {
-        "lng": 77.801436,
-        "lat": 7.271375
+        "lng": 76.503065,
+        "lat": 8.382704
       },
       "alertType": "oil-spill",
       "lottiePath": "/animation/hotspot/not-complete-safe-orange.json",
@@ -19,7 +19,8 @@
         "bg": "#dc2626",
         "border": "#b91c1c",
         "text": "#ffffff"
-      }
+      },
+      "marker-color": "#ea580c"
     },
     {
       "id": "tsunami-alert-2",
@@ -28,7 +29,7 @@
         "lat": 13.082680
       },
       "alertType": "tsunami",
-      "lottiePath": "/animation/hotspot/danger-red.json",
+      "lottiePath": "/animation/hotspot/not-complete-safe-orange.json",
       "alertName": "Tsunami Warning",
       "title": "Critical Alert",
       "timeToCoast": "30 min",
@@ -40,7 +41,8 @@
         "bg": "#b91c1c",
         "border": "#991b1b",
         "text": "#ffffff"
-      }
+      },
+      "marker-color": "#dc2626"
     },
         {
       "id": "tsunami-alert-3",
@@ -49,7 +51,7 @@
         "lat": 6.700032
       },
       "alertType": "hightide",
-      "lottiePath": "/animation/hotspot/little-safe-yellow.json",
+      "lottiePath": "/animation/hotspot/not-complete-safe-orange.json",
       "alertName": "Tsunami Warning",
       "title": "Critical Alert",
       "timeToCoast": "30 min",
@@ -61,7 +63,52 @@
         "bg": "#b91c1c",
         "border": "#991b1b",
         "text": "#ffffff"
-      }
+      },
+      "marker-color": "#eab308"
+    },
+    {
+      "id": "flood-1",
+      "coordinates": {
+        "lng": 76.503065,
+        "lat": 8.382704
+      },
+      "alertType": "Flood",
+      "lottiePath": "/animation/hotspot/not-complete-safe-orange.json",
+      "alertName": "flood Warning",
+      "title": "Proximity Alert",
+      "timeToCoast": "30 min",
+      "evacuationTime": "15 min",
+      "windSpeed": "25 km/h → SE",
+      "observer": "kushagra kanaujia",
+      "severity": "Emergency priority 1",
+      "colors": {
+        "bg": "#b91c1c",
+        "border": "#991b1b",
+        "text": "#ffffff"
+      },
+      "marker-color": "#2563eb"
+    },
+    {
+      "id": "flood-1",
+      "coordinates": {
+        "lng": 76.843094,
+        "lat": 6.961585
+      },
+      "alertType": "Flood",
+      "lottiePath": "/animation/hotspot/not-complete-safe-orange.json",
+      "alertName": "flood Warning",
+      "title": "Proximity Alert",
+      "timeToCoast": "30 min",
+      "evacuationTime": "15 min",
+      "windSpeed": "25 km/h → SE",
+      "observer": "kushagra kanaujia",
+      "severity": "Emergency priority 1",
+      "colors": {
+        "bg": "#b91c1c",
+        "border": "#991b1b",
+        "text": "#ffffff"
+      },
+      "marker-color": "#10b981"
     }
   ]
 }

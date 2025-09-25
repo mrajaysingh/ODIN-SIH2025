@@ -45,7 +45,7 @@ export default function SyncedDisasterCarousel() {
           'Continuous rain triggered waterlogging; community volunteers assisted children and the elderly to safety.',
         livesLost: 4,
         livesSaved: 640,
-        image: '/incident/ocean-flood.png',
+        image: '/incident/urban-flood-and-relief.jpg',
       },
       {
         id: 'ship-fire',
@@ -65,7 +65,7 @@ export default function SyncedDisasterCarousel() {
           'Booms deployed quickly to contain slick; shoreline cleanup teams minimized ecological damage.',
         livesLost: 0,
         livesSaved: 0,
-        image: '/incident/oil-spill-in-ocean.png',
+        image: '/incident/oil-rig.avif',
       },
       {
         id: 'plane-ditching',

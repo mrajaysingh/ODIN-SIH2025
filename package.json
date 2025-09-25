@@ -1,30 +1,49 @@
 {
-  "name": "website",
-  "version": "0.1.0",
+  "name": "odin-frontend",
+  "version": "1.0.0",
+  "description": "O.D.I.N. - Ocean Disaster Information Network Frontend",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "start": "next start"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@emotion/react": "11.14.0",
-    "@emotion/styled": "11.14.1",
-    "@maptiler/sdk": "^3.7.0",
-    "@mui/material": "7.3.2",
-    "@mui/x-charts": "8.11.1",
-    "lottie-web": "5.13.0",
-    "next": "15.5.2",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-icons": "^5.5.0"
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@maptiler/sdk": "^3.8.0",
+    "@mui/material": "^7.3.2",
+    "@mui/x-charts": "^8.11.3",
+    "@types/leaflet": "^1.9.0",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.21",
+    "framer-motion": "^11.0.0",
+    "leaflet": "^1.9.0",
+    "lottie-react": "^2.4.0",
+    "lottie-web": "^5.13.0",
+    "lucide-react": "^0.400.0",
+    "next": "^14.2.0",
+    "postcss": "^8.5.6",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "react-icons": "^5.5.0",
+    "react-leaflet": "^4.2.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.5.0"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
 }

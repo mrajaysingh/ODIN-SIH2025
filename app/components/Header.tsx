@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
@@ -11,10 +12,26 @@ export default function Header() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMounted, setIsMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [loadingMenu, setLoadingMenu] = useState<string | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Clear loading indicator when the route (path) changes
+  useEffect(() => {
+    if (!isMounted) return;
+    setLoadingMenu(null);
+  }, [pathname, isMounted]);
+
+  // Also clear on hash-only navigations within the same path
+  useEffect(() => {
+    if (!isMounted) return;
+    const onHashChange = () => setLoadingMenu(null);
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [isMounted]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -62,7 +79,7 @@ export default function Header() {
 
   const languages = [
     { code: 'EN', name: 'English' },
-    { code: 'EN', name: 'Hindi' },
+    { code: 'HI', name: 'Hindi' },
     { code: 'ES', name: 'Español' },
     { code: 'FR', name: 'Français' },
     { code: 'DE', name: 'Deutsch' }
@@ -93,7 +110,7 @@ export default function Header() {
           <div className="flex items-center space-x-2 sm:space-x-3">
             <div className="w-8 h-8 sm:w-12 sm:h-12 bg-white rounded-lg flex items-center justify-center">
               <Image
-                src="/ODIN-tp svg.svg"
+                src="/assets/ODIN-tp.svg"
                 alt="ODIN Logo"
                 width={100}
                 height={100}
@@ -116,11 +133,11 @@ export default function Header() {
                   case 'Report Hazard':
                     return '/report-hazard';
                   case 'Live Alerts':
-                    return '/#alerts';
+                     return '/live-alerts';
                   case 'Community':
                     return '/community';
                 case 'About O.D.I.N.':
-                  return '/#about';
+                  return '/about';
                   default:
                     return '/';
                 }
@@ -130,14 +147,22 @@ export default function Header() {
                 <Link
                   key={item}
                   href={getHref(item)}
-                  onClick={() => setActiveMenu(item)}
+                  onClick={() => {
+                    setActiveMenu(item);
+                    setLoadingMenu(item);
+                  }}
                   className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
                     activeMenu === item
                       ? 'bg-blue-600 text-white'
                       : 'text-white hover:bg-blue-700 hover:text-white'
                   }`}
                 >
-                  {item}
+                  <span className="inline-flex items-center gap-2">
+                    <span>{item}</span>
+                    {loadingMenu === item && (
+                      <span className="w-3.5 h-3.5 border-2 border-white/80 border-t-transparent rounded-full animate-spin"></span>
+                    )}
+                  </span>
                 </Link>
               );
             })}
@@ -180,9 +205,9 @@ export default function Header() {
             </div>
 
             {/* Login Button */}
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+            <Link href="/login" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
               Login
-            </button>
+            </Link>
 
             {/* Mobile Menu Button */}
             <button 
@@ -232,6 +257,7 @@ export default function Header() {
                   onClick={() => {
                     setActiveMenu(item);
                     setIsMobileMenuOpen(false);
+                    setLoadingMenu(item);
                   }}
                   className={`mobile-menu-item flex items-center gap-3 w-full text-left px-4 py-3 rounded-lg transition-all duration-200 text-sm font-medium ${
                     activeMenu === item
@@ -265,7 +291,12 @@ export default function Header() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   )}
-                  <span>{item}</span>
+                  <span className="inline-flex items-center gap-2">
+                    <span>{item}</span>
+                    {loadingMenu === item && (
+                      <span className="w-3.5 h-3.5 border-2 border-white/80 border-t-transparent rounded-full animate-spin"></span>
+                    )}
+                  </span>
                 </Link>
               );
             })}

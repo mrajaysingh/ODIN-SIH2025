@@ -20,6 +20,7 @@ export default function Map({ className = '' }: MapProps) {
   const [isReloading, setIsReloading] = useState(false);
   const [loadingStep, setLoadingStep] = useState('');
   const [mapOpacity, setMapOpacity] = useState(1);
+  const [isGridEnabled] = useState(true);
   
   // Default location coordinates
   const defaultLocation = {
@@ -43,6 +44,7 @@ export default function Map({ className = '' }: MapProps) {
       style: maptilersdk.MapStyle.SATELLITE,
       center: [defaultLocation.lng, defaultLocation.lat], // [lng, lat] - Default location
       zoom: 6.5,
+      minZoom: 4,
       // Disable all default controls to have full control
       attributionControl: false,
       // Disable all default navigation controls
@@ -65,6 +67,14 @@ export default function Map({ className = '' }: MapProps) {
 
       // Add place labels to the map
       addPlaceLabels();
+
+      // Initialize grid overlay
+      if (isGridEnabled) {
+        ensureGridLayers();
+        updateGrid();
+        map.current?.on('moveend', updateGrid);
+        map.current?.on('zoomend', updateGrid);
+      }
 
       // Wait until preloader is not active before adding hotspots
       waitForPreloaderInactive().then(() => {
@@ -95,6 +105,11 @@ export default function Map({ className = '' }: MapProps) {
 
     return () => {
       if (map.current) {
+        // Remove grid listeners
+        if (isGridEnabled) {
+          map.current.off('moveend', updateGrid);
+          map.current.off('zoomend', updateGrid);
+        }
         map.current.remove();
         map.current = null;
       }
@@ -129,7 +144,8 @@ export default function Map({ className = '' }: MapProps) {
     const coordinates = proximityAlertsData.alerts.map(alert => [alert.coordinates.lng, alert.coordinates.lat]);
     console.log('Alert coordinates:', coordinates);
 
-    // Add each alert to the map
+    // Add all alerts to the map synchronously to ensure identical conditions
+    console.log('Creating all markers synchronously...');
     proximityAlertsData.alerts.forEach((alert, index) => {
       console.log(`Adding alert ${index + 1}:`, alert.id, 'at coordinates:', alert.coordinates);
       
@@ -144,10 +160,13 @@ export default function Map({ className = '' }: MapProps) {
           evacuationTime: alert.evacuationTime,
           wind: alert.windSpeed,
           observer: alert.observer,
-          colors: alert.colors
-        }
+          colors: alert.colors,
+          markerColor: alert['marker-color']
+        },
+        index // Pass the index for debugging
       );
     });
+    console.log('All markers created successfully');
 
     // Fit all alert markers in view if there are any
     if (coordinates.length > 0) {
@@ -173,64 +192,58 @@ export default function Map({ className = '' }: MapProps) {
       wind: string;
       observer: string;
       colors: { bg: string; border: string; text: string };
-    }
+      markerColor: string;
+     },
+     index?: number
   ) => {
     if (!map.current) return;
 
-    console.log(`Creating marker for alert at ${lng}, ${lat} with animation: ${options.lottiePath}`);
+    console.log(`Creating marker ${index !== undefined ? index + 1 : '?'} for alert at ${lng}, ${lat}`);
     
-    const container = document.createElement('div');
-    container.style.width = '84px';
-    container.style.height = '84px';
-    container.style.pointerEvents = 'auto';
-    container.style.zIndex = '9999';
-    container.style.position = 'relative';
-    container.style.cursor = 'pointer';
-    container.style.transform = 'translate(-50%, -50%)';
-    container.style.backgroundColor = 'rgba(255, 0, 0, 0.3)'; // Temporary red background for debugging
+    // Create a simple, consistent marker element without Lottie animations to test positioning
+    const markerElement = document.createElement('div');
+    markerElement.style.width = '30px';
+    markerElement.style.height = '30px';
+    markerElement.style.borderRadius = '50%';
+    markerElement.style.pointerEvents = 'auto';
+    markerElement.style.cursor = 'pointer';
+    markerElement.style.display = 'flex';
+    markerElement.style.alignItems = 'center';
+    markerElement.style.justifyContent = 'center';
+    markerElement.style.fontSize = '12px';
+    markerElement.style.fontWeight = 'bold';
+    markerElement.style.color = 'white';
+    markerElement.style.boxSizing = 'border-box';
+    markerElement.style.border = '3px solid white';
+    markerElement.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
 
-    // Add error handling for Lottie animations
-    try {
-      const animation = lottie.loadAnimation({
-        container,
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: options.lottiePath,
-        rendererSettings: { preserveAspectRatio: 'xMidYMid slice' },
-      });
-      
-      animation.addEventListener('data_ready', () => {
-        console.log(`Lottie animation loaded successfully for ${options.alertType} at ${lng}, ${lat}`);
-        // Remove red background once animation loads
-        container.style.backgroundColor = 'transparent';
-      });
-      
-      animation.addEventListener('data_failed', () => {
-        console.error(`Failed to load Lottie animation: ${options.lottiePath}`);
-        // Keep red background if animation fails to load
-        container.innerHTML = '⚠️'; // Fallback emoji
-        container.style.display = 'flex';
-        container.style.alignItems = 'center';
-        container.style.justifyContent = 'center';
-        container.style.fontSize = '24px';
-      });
-    } catch (error) {
-      console.error(`Error loading Lottie animation: ${error}`);
-      // Fallback if Lottie fails completely
-      container.innerHTML = '⚠️';
-      container.style.display = 'flex';
-      container.style.alignItems = 'center';
-      container.style.justifyContent = 'center';
-      container.style.fontSize = '24px';
-    }
+    // Use marker color from the JSON data
+    const backgroundColor = options.markerColor;
+    
+    markerElement.style.backgroundColor = backgroundColor;
+    
+    console.log(`Creating marker at ${lng}, ${lat} with background: ${backgroundColor}`);
+    
+// Create the marker with the simple element
 
-    const marker = new maptilersdk.Marker({ element: container, anchor: 'center' })
+    const marker = new maptilersdk.Marker({ 
+     element: markerElement,
+      anchor: 'center',
+
+      offset: [0, 0]
+    })
       .setLngLat([lng, lat])
       .addTo(map.current);
+
+
+      console.log(`Marker ${index !== undefined ? index + 1 : '?'} successfully added to map at ${lng}, ${lat}`);
+    
+    // Force a refresh of the marker position
+    setTimeout(() => {
+      marker.setLngLat([lng, lat]);
+      console.log(`Position refreshed for marker ${index !== undefined ? index + 1 : '?'} at ${lng}, ${lat}`);
+    }, 100);
       
-    console.log(`Marker added to map at ${lng}, ${lat}`);
-    console.log('Current map markers count:', map.current._markers?.length || 'unknown');
 
     const popupHtml = `
       <div style="min-width:220px;max-width:260px;background:${options.colors.bg};color:${options.colors.text};border:1px solid ${options.colors.border};border-radius:8px;padding:10px;box-shadow:0 6px 16px rgba(0,0,0,0.25)">
@@ -285,20 +298,21 @@ export default function Map({ className = '' }: MapProps) {
       el.addEventListener('mouseleave', onPopupLeave);
     });
 
-    container.addEventListener('mouseenter', onContainerEnter);
-    container.addEventListener('mouseleave', onContainerLeave);
-    container.addEventListener('click', onClick);
+    markerElement.addEventListener('mouseenter', onContainerEnter);
+    markerElement.addEventListener('mouseleave', onContainerLeave);
+    markerElement.addEventListener('click', onClick);
 
     return () => {
-      container.removeEventListener('mouseenter', onContainerEnter);
-      container.removeEventListener('mouseleave', onContainerLeave);
-      container.removeEventListener('click', onClick);
+      markerElement.removeEventListener('mouseenter', onContainerEnter);
+      markerElement.removeEventListener('mouseleave', onContainerLeave);
+      markerElement.removeEventListener('click', onClick);
       const el = popup.getElement();
       if (el) {
         el.removeEventListener('mouseenter', onPopupEnter);
         el.removeEventListener('mouseleave', onPopupLeave);
       }
       popup.remove();
+      marker.remove();
     };
   };
 
@@ -517,6 +531,10 @@ export default function Map({ className = '' }: MapProps) {
       // Add place labels after style change
       setTimeout(() => {
         addPlaceLabels();
+        if (isGridEnabled) {
+          ensureGridLayers();
+          updateGrid();
+        }
       }, 100);
     }
   };
@@ -571,6 +589,7 @@ export default function Map({ className = '' }: MapProps) {
           style: currentStyle || maptilersdk.MapStyle.SATELLITE,
           center: [currentCenter.lng, currentCenter.lat],
           zoom: currentZoom,
+          minZoom: 4,
           bearing: currentBearing,
           attributionControl: false,
           navigationControl: false,
@@ -592,6 +611,14 @@ export default function Map({ className = '' }: MapProps) {
 
           // Add place labels to the map
           addPlaceLabels();
+          
+          // Initialize grid overlay
+          if (isGridEnabled) {
+            ensureGridLayers();
+            updateGrid();
+            map.current?.on('moveend', updateGrid);
+            map.current?.on('zoomend', updateGrid);
+          }
           
           // Wait until preloader is not active before adding hotspots
           waitForPreloaderInactive().then(() => {
@@ -623,6 +650,156 @@ export default function Map({ className = '' }: MapProps) {
 
         setTimeout(cleanup, 100);
       }
+    }
+  };
+
+  // ----- Grid Overlay -----
+  type Feature = GeoJSON.Feature<GeoJSON.Geometry, { [key: string]: any }>;
+  type FeatureCollection = GeoJSON.FeatureCollection<GeoJSON.Geometry, { [key: string]: any }>;
+
+  const getGridStepForZoom = (zoom: number): number => {
+    if (zoom >= 12) return 0.01; // ~1.1km at equator
+    if (zoom >= 10) return 0.05;
+    if (zoom >= 8) return 0.1;
+    if (zoom >= 6) return 0.25;
+    if (zoom >= 4) return 0.5;
+    if (zoom >= 2) return 1;
+    return 2;
+  };
+
+  const clampBounds = (bounds: maptilersdk.LngLatBounds): maptilersdk.LngLatBounds => {
+    const west = Math.max(-180, bounds.getWest());
+    const south = Math.max(-85, bounds.getSouth());
+    const east = Math.min(180, bounds.getEast());
+    const north = Math.min(85, bounds.getNorth());
+    return new maptilersdk.LngLatBounds([west, south], [east, north]);
+  };
+
+  const buildGridData = (bounds: maptilersdk.LngLatBounds, step: number): { lines: FeatureCollection; points: FeatureCollection } => {
+    const clamped = clampBounds(bounds);
+    const west = clamped.getWest();
+    const south = clamped.getSouth();
+    const east = clamped.getEast();
+    const north = clamped.getNorth();
+
+    const startLon = Math.floor(west / step) * step;
+    const endLon = Math.ceil(east / step) * step;
+    const startLat = Math.floor(south / step) * step;
+    const endLat = Math.ceil(north / step) * step;
+
+    const lineFeatures: Feature[] = [];
+    const pointFeatures: Feature[] = [];
+
+    let lineCount = 0;
+    const maxLines = 500;
+
+    // Vertical lines (constant lon)
+    for (let lon = startLon; lon <= endLon && lineCount < maxLines; lon = +(lon + step).toFixed(10)) {
+      lineFeatures.push({
+        type: 'Feature',
+        properties: { kind: 'lon', lon },
+        geometry: {
+          type: 'LineString',
+          coordinates: [ [lon, south], [lon, north] ]
+        }
+      });
+      lineCount++;
+    }
+
+    // Horizontal lines (constant lat)
+    for (let lat = startLat; lat <= endLat && lineCount < maxLines; lat = +(lat + step).toFixed(10)) {
+      lineFeatures.push({
+        type: 'Feature',
+        properties: { kind: 'lat', lat },
+        geometry: {
+          type: 'LineString',
+          coordinates: [ [west, lat], [east, lat] ]
+        }
+      });
+      lineCount++;
+    }
+
+    // Points at intersections (labels)
+    const maxPoints = 2000;
+    let pointCount = 0;
+    for (let lon = startLon; lon <= endLon && pointCount < maxPoints; lon = +(lon + step).toFixed(10)) {
+      for (let lat = startLat; lat <= endLat && pointCount < maxPoints; lat = +(lat + step).toFixed(10)) {
+        const label = `${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+        pointFeatures.push({
+          type: 'Feature',
+          properties: { label, lat, lon },
+          geometry: { type: 'Point', coordinates: [lon, lat] }
+        });
+        pointCount++;
+      }
+    }
+
+    return {
+      lines: { type: 'FeatureCollection', features: lineFeatures },
+      points: { type: 'FeatureCollection', features: pointFeatures }
+    };
+  };
+
+  const ensureGridLayers = () => {
+    if (!map.current) return;
+    const m = map.current;
+
+    if (!m.getSource('grid-lines')) {
+      m.addSource('grid-lines', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+    }
+    if (!m.getLayer('grid-lines')) {
+      m.addLayer({
+        id: 'grid-lines',
+        type: 'line',
+        source: 'grid-lines',
+        paint: {
+          'line-color': '#ffffff',
+          'line-opacity': 0.05,
+          'line-blur': [ 'interpolate', ['linear'], ['zoom'], 4, 0.2, 8, 0.6, 12, 1.2 ],
+          'line-width': [ 'interpolate', ['linear'], ['zoom'], 4, 0.25, 8, 0.75, 12, 1.25 ]
+        }
+      });
+    }
+
+    if (!m.getSource('grid-points')) {
+      m.addSource('grid-points', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+    }
+    if (!m.getLayer('grid-point-labels')) {
+      m.addLayer({
+        id: 'grid-point-labels',
+        type: 'symbol',
+        source: 'grid-points',
+        layout: {
+          'text-field': ['get', 'label'],
+          'text-size': [ 'interpolate', ['linear'], ['zoom'], 4, 8, 8, 10, 12, 12 ],
+          'text-anchor': 'center',
+          'text-offset': [0, 0]
+        },
+        paint: {
+          'text-color': '#ffffff',
+          'text-halo-color': 'rgba(0,0,0,0.05)',
+          'text-halo-width': 0.5,
+          'text-opacity': 0.05
+        }
+      });
+    }
+  };
+
+  const updateGrid = () => {
+    if (!map.current) return;
+    const m = map.current;
+    const bounds = m.getBounds();
+    const zoom = m.getZoom();
+    const step = getGridStepForZoom(zoom);
+    const { lines, points } = buildGridData(bounds, step);
+
+    const linesSource = m.getSource('grid-lines') as maptilersdk.GeoJSONSource | undefined;
+    const pointsSource = m.getSource('grid-points') as maptilersdk.GeoJSONSource | undefined;
+    if (linesSource && 'setData' in linesSource) {
+      (linesSource as any).setData(lines);
+    }
+    if (pointsSource && 'setData' in pointsSource) {
+      (pointsSource as any).setData(points);
     }
   };
 

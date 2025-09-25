@@ -39,12 +39,15 @@ export default function Preloader({ onComplete, duration = 3000 }: PreloaderProp
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Background image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/preloader-background.jpg')",
-        }}
-      >
+      <div className="absolute inset-0">
+        <video
+          className="w-full h-full object-cover"
+          src="/assets/blue-ocean.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-black/30"></div>
       </div>
@@ -74,7 +77,7 @@ export default function Preloader({ onComplete, duration = 3000 }: PreloaderProp
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-16 h-16 relative preloader-logo">
               <Image
-                src="/ODIN-tp svg.svg"
+                src="/assets/ODIN-tp.svg"
                 alt="ODIN Logo"
                 fill
                 className="object-contain filter drop-shadow-2xl brightness-110"
